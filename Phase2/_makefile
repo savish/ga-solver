@@ -1,0 +1,22 @@
+#makefile GA Solver Phase 2 make file
+
+main : main.o Generation.o Population.o Chromosome.o Gene.o StatsUtility.o
+	g++ -o main main.o Generation.o Population.o Chromosome.o Gene.o StatsUtility.o
+
+main.o: main.cpp Generation.h Population.h Chromosome.h Gene.h StatsUtility.h
+	g++ -c main.cpp
+
+Generation.o: Generation.cpp Generation.h Population.h Chromosome.h Gene.h StatsUtility.h
+	g++ -c Generation.cpp
+
+Population.o: Population.cpp Population.h Chromosome.h Gene.h StatsUtility.h
+	g++ -c Population.cpp
+
+Chromosome.o: Chromosome.cpp Chromosome.h Gene.h StatsUtility.h
+	g++ -c Chromosome.cpp
+
+Gene.o: Gene.cpp Gene.h
+	g++ -c Gene.cpp
+
+StatsUtility.o: StatsUtility.cpp StatsUtility.h
+	g++ -c StatsUtility.cpp
