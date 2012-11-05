@@ -18,7 +18,7 @@ private:
 public:
 	Chromosome() {}
 	Chromosome(GeneList genes): genes(genes) {}
-	static Chromosome *GenerateRandom(int size, int seedMod);
+	static Chromosome *GenerateRandom(int size, int seedMod, std::vector<std::string> geneNames);
 	
 	GeneList getGenes() { return genes; }
 	Gene *getGene(int index) { return &genes[index]; }
@@ -31,7 +31,7 @@ public:
 	iterator begin() { return genes.begin(); }
 	iterator end() { return genes.end(); }
 	
-	void EvaluateFitness();
+	void EvaluateFitness(vector<Equation *> equations);
 };
 
 #endif

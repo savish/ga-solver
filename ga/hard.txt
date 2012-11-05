@@ -1,0 +1,1 @@
+POPULATION SIZE: 40MUTATION: 0.40GENERATIONS: 400CROSSOVER POINTS: 4RESOLUTION: 10EQUATIONS:( x - i ) ^ p + ( y - j ) ^ p + ( z - k ) ^ p - 1 = r ^ p - sqrt wsqrt ( x * y * r ) = sqrt x * sqrt y * sqrt rlog x = w + x ^ w + ylog r = p - z( i - j - k ) * ( - y ) = max ( r / ( - q ) , max ( y , z ) )

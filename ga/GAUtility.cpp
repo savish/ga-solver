@@ -134,7 +134,7 @@ namespace GAUtility
 							else
 							{
 								// Special case for - negation
-								if ((localString.at(ir) == '-'))
+								if (localString.at(ir) == '-')
 								{ 
 									if ((localString.at(ir - 2) == '(') || (localString.at(ir-2) == '=') || (localString.at(ir-2) == ',')) {} else
 									{

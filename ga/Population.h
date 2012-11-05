@@ -22,6 +22,7 @@ public:
 	void AddChromosome(Chromosome inputChromosome) { population.push_back(inputChromosome); }
 	ChromosomeList getPopulation() { return population; }
 	ParentUnit *getParentUnit(int index) { return &parents[index]; }
+	void clearPopulation() { population.clear(); }
 	
 	void SelectParents(int numberOfPairs);
 	void RankFitness();
@@ -30,6 +31,8 @@ public:
 	typedef ChromosomeList::const_iterator const_iterator;
 	iterator begin() { return population.begin(); }
 	iterator end() { return population.end(); }
+	
+	Population& operator=(const Population& other);
 	
 };
 

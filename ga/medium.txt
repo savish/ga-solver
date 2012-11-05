@@ -1,0 +1,1 @@
+POPULATION SIZE: 40MUTATION: 0.35GENERATIONS: 400CROSSOVER POINTS: 3RESOLUTION: 10EQUATIONS:sqrt a = sqrt 36 + dmax ( a , b ) = 7 * cc ^ 3 + d * ( 4 - e ) = a ^ 2 - b / c * a - ( d + 2 ) ^ c - 573( ( a + b ) / 5 ) ^ d = e - 1

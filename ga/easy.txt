@@ -1,0 +1,1 @@
+POPULATION SIZE: 30MUTATION: 0.3GENERATIONS: 400CROSSOVER POINTS: 2RESOLUTION: 10EQUATIONS:x + 7 = y * 1x * x = z ^ 2 / ( x - 19 )5 + z = 6 + x - 14 * y = x * 5 + 8y - 7 = (x + z) / 2a = z * 2

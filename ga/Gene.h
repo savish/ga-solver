@@ -19,7 +19,7 @@ public:
 	std::string getName() { return name; }
 	void setName(std::string inputName) { name = inputName; }
 
-	void Mutate(double mutationProbability);
+	void Mutate(double mutationProbability, int seedmod);
 };
 
 #endif

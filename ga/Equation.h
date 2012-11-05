@@ -24,6 +24,9 @@ class Equation
 		int evaluateLHS();//If at least one variable does not have a value, throw an exception string
 		void instantiateVariable(char name, int value);//If does not exist in the equation, throw an exception string
 		int RHSdistanceFromLHS();//If at least one variable does not have a value, throw an exception string
+		
+		vector<string> getVariableNames() { return variableNames; } // returns the names of the variables in the equation
+
 
 	private:
 		Expression* left;//Left side of the equals
@@ -35,6 +38,7 @@ class Equation
 		int EvaluateRPNExpression(Queue rpnExpression);
 		Queue CreateRPNExpression(Expression inputExpression);
 		Expression *ParseEquationToExpression(string toSplit);
+		vector<string> variableNames;
 
 };
 

@@ -20,7 +20,7 @@ Expression Expression::operator/(const Expression& other)
 	if (other.value != 0) 
 		return Expression(value / other.value);
 	else 
-		throw "Division by zero is undefined";
+		throw string("Division by zero is undefined");
 }
 
 Expression Expression::operator*(const Expression& other)
@@ -45,11 +45,16 @@ Expression Expression::sqt()
 	{
 		if (GAUtility::IsNumber(name)) 
 		{
-			ans = sqrt((double)GAUtility::ConvertToInt(name));
+			int val = GAUtility::ConvertToInt(name);
+			if (val>-1) { ans = sqrt((double)val); }
+			else { ans = 0; }
 		}
 	}
 	else
-		ans = sqrt((double)value);
+	{
+		if (value>-1) { ans = sqrt((double)value); }
+		else { ans = 0; }
+	}
 	return Expression((int) ans);
 }
 Expression Expression::lgm()

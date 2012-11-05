@@ -5,17 +5,20 @@ void Population::SelectParents(int numberOfPairs)
 	RankFitness();
 	
 	int populationMaxIndex = numberOfPairs * 2 - 1; // n-1
-	int pairLimit; //r
-	int parent1ix, parent2ix;
+	int pairLimit = numberOfPairs-1; //r
+	int parent1ix = numberOfPairs-2;
+	int parent2ix = numberOfPairs-3;
 	
 	for (int ix = 0; ix < numberOfPairs; ix++)
 	{
-		pairLimit = GAUtility::GenerateRandomNumber(0,populationMaxIndex,0); //r
-		parent1ix = GAUtility::GenerateRandomNumber(0,pairLimit,-7);
-		parent2ix = GAUtility::GenerateRandomNumber(0,pairLimit,5);
+		pairLimit = GAUtility::GenerateRandomNumber(0,populationMaxIndex,pairLimit+ix); //r
+		parent1ix = GAUtility::GenerateRandomNumber(0,pairLimit,parent1ix+ix);
+		parent2ix = GAUtility::GenerateRandomNumber(0,pairLimit,parent2ix+ix);
 	
 		ParentUnit parentPair;
 	
+		if (parent2ix == parent1ix) { parent2ix++; }
+		
 		parentPair.AddParent(population[parent1ix]);
 		parentPair.AddParent(population[parent2ix]);
 	
@@ -47,4 +50,10 @@ void Population::RankFitness()
 		}
 	}
 	while (swapped);
+}
+
+Population& Population::operator=(const Population& other)
+{
+	population.clear();
+	population = other.population;
 }

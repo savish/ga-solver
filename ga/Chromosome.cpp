@@ -2,7 +2,7 @@
 
 using namespace std;
 
-void Chromosome::EvaluateFitness(vector<Equation> equations)
+void Chromosome::EvaluateFitness(vector<Equation *> equations)
 {
 	
 	int sum = 0;
@@ -13,10 +13,10 @@ void Chromosome::EvaluateFitness(vector<Equation> equations)
 		{
 			try
 			{
-				equations[ix].instantiateVariable(genes[ixGene].getName()[0],genes[ixGene].getAllele())
+				equations[ix]->instantiateVariable(genes[ixGene].getName()[0],genes[ixGene].getAllele());
 			} catch(string ex) { }
 		}
-		sum = sum + abs(equations[ix].RHSdistanceFromLHS());
+		sum = sum + abs(equations[ix]->RHSdistanceFromLHS());
 	}
 	fitness = sum;
 	
@@ -34,14 +34,14 @@ void Chromosome::EvaluateFitness(vector<Equation> equations)
 
 // Seedmod is passed by the calling loop (it is the loop index)
 // specifically to ensure that the generated numbers vary.
-Chromosome *Chromosome::GenerateRandom(int size, int seedMod)
+Chromosome *Chromosome::GenerateRandom(int size, int seedMod, vector<string> geneNames)
 {
 	Chromosome *ans = new Chromosome();
 	
 	for (int i=0; i<size; i++)
 	{
 		seedMod = GAUtility::GenerateRandomNumber(-20,20,seedMod);
-		ans->AddGene(Gene(seedMod,""));
+		ans->AddGene(Gene(seedMod,geneNames[i]));
 	}
 	return ans;
 }

@@ -2,8 +2,10 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <ctype.h>
 #include "Population.h"
 #include "GAUtility.h"
+#include "Equation.h"
 
 using namespace std;
 
@@ -114,10 +116,10 @@ void testPopulation()
 
 int main(int argc, char** argv)
 {
-	testGene();
-	testChromosome();
-	testParentUnit();
-	testPopulation();
+	// testGene();
+	// testChromosome();
+	// testParentUnit();
+	// testPopulation();
 	
 	bool readingEquations = false;
 	
@@ -137,6 +139,8 @@ int main(int argc, char** argv)
 	int crossoverPoints = 20;
 	int resolution = 100;
 	vector<string> equations;
+	
+	int chromosomeSize = 4;
 	
 	// Read and initialise parameters
 	
@@ -205,7 +209,7 @@ int main(int argc, char** argv)
 		else // reading equations
 		{
 			if (line.length() > 2)
-				equations.push_back(line);
+				equations.push_back(line.substr(0,line.length()));
 		}
 		
 	}
@@ -228,33 +232,232 @@ int main(int argc, char** argv)
 	
 	// --
 	
-	Population *parents = new Population();
+	vector<Equation *> inputEquations;
+	Equation *eq;
 	
-	for (int ix = 0; ix < populationSize; ix++)
+	for (int ix = 0; ix < equations.size(); ix++)
 	{
-		parents->AddChromosome(*Chromosome::GenerateRandom(CHROM_SIZE,ix));
+		eq = new Equation(equations[ix]);
+		inputEquations.push_back(eq);
 	}
 	
-	for (int ix = 0; ix < populationSize; ix++)
-	{
-		parents->getChromosome(ix)->EvaluateFitness();
-	}
+	vector<string> allVariables;
+	vector<string> uniqueVariables;
 	
-	parents->RankFitness();
-	
-	for (int ix = 0; ix < populationSize; ix++)
+	// Identify variables
+	for (int ix = 0; ix < inputEquations.size(); ix++)
 	{
-		
-		cout << "[";
-		for (int jx = 0; jx < CHROM_SIZE; jx++)
+		for (int iix = 0; iix < inputEquations[ix]->getVariableNames().size(); iix++)
 		{
-			cout << parents->getChromosome(ix)->getGene(jx)->getAllele();
-			if (jx < CHROM_SIZE-1)
-				cout << ",";
+			allVariables.push_back(inputEquations[ix]->getVariableNames()[iix]);
 		}
-		cout << "] : " << parents->getChromosome(ix)->getFitness() << endl;
 	}
 	
+	for (int ix = 0; ix < allVariables.size(); ix++)
+	{
+		if (ix == 0) 
+		{ 
+			if (isalpha(allVariables[ix][0])) { uniqueVariables.push_back(allVariables[ix]); }
+		}
+		else
+		{
+			found = false;
+			for (int iix = 0; iix < uniqueVariables.size(); iix++)
+			{
+				if (allVariables[ix] == uniqueVariables[iix]) { found = true; }
+			}
+			if (!found)
+			{
+				if (isalpha(allVariables[ix][0])) { uniqueVariables.push_back(allVariables[ix]); }
+			} 
+		}
+	}
 	
+	chromosomeSize = uniqueVariables.size();
+	
+	try 
+	{
+	
+		Population P;
+		Population O;
+	
+		for (int ix = 0; ix < populationSize; ix++)
+		{
+			P.AddChromosome(*Chromosome::GenerateRandom(chromosomeSize,ix, uniqueVariables));
+		}
+		
+		int G = 0;
+		int res = 1;
+		bool found = false;
+		ChromosomeList cl;
+	
+		while (G < generationSize && found == false)	
+		{
+	
+			for (int ix = 0; ix < populationSize; ix++)
+			{
+				P.getChromosome(ix)->EvaluateFitness(inputEquations);
+			}
+	
+			P.RankFitness();
+			
+			
+			if (res == resolution)
+			{
+				cout << endl << endl;
+				cout << "Generation: " << G+1 << endl;
+				cout << "Chromomsome: " << endl;
+				for (int ix = 0; ix < chromosomeSize; ix++)
+				{
+					cout << P.getChromosome(0)->getGene(ix)->getName() << " = " << P.getChromosome(0)->getGene(ix)->getAllele() << endl;
+				}
+				cout << endl << "Fitness: " << P.getChromosome(0)->getFitness() << endl;
+				cout << endl << "Solution: " << endl;
+				
+				for (int ix = 0; ix < inputEquations.size(); ix++)
+				{
+					for (int ixGene = 0; ixGene < chromosomeSize; ixGene++)
+					{
+						try
+						{
+							inputEquations[ix]->instantiateVariable(P.getChromosome(0)->getGene(ixGene)->getName()[0],P.getChromosome(0)->getGene(ixGene)->getAllele());
+						} catch(string ex) { }
+					}
+					cout << inputEquations[ix]->evaluateLHS() << " = " << inputEquations[ix]->evaluateRHS() << endl;
+				}
+				
+				res = 0;
+			}
+			
+			
+			/*
+			
+			for (int ix = 0; ix < populationSize; ix++)
+			{
+		
+				cout << "[";
+				for (int jx = 0; jx < chromosomeSize; jx++)
+				{
+					cout << P.getChromosome(ix)->getGene(jx)->getName() << ":" << P.getChromosome(ix)->getGene(jx)->getAllele();
+					if (jx < chromosomeSize-1)
+						cout << ",";
+				}
+				cout << "] : " << P.getChromosome(ix)->getFitness() << endl;
+			}
+			
+			*/
+			
+			if (P.getChromosome(0)->getFitness() == 0 ) { found = true; }
+			
+			P.SelectParents(populationSize/2);
+			
+			/*
+			cout << endl << endl;
+
+			for (int ix = 0; ix < populationSize/2; ix++)
+			{
+		
+				cout << "[";
+				for (int jx = 0; jx < chromosomeSize; jx++)
+				{
+					cout << P.getParentUnit(ix)->getParent(0)->getGene(jx)->getName() << ":" << P.getParentUnit(ix)->getParent(0)->getGene(jx)->getAllele();
+					if (jx < chromosomeSize-1)
+						cout << ",";
+				}
+				cout << "] ";
+				cout << "[";
+				for (int jx = 0; jx < chromosomeSize; jx++)
+				{
+					cout << P.getParentUnit(ix)->getParent(1)->getGene(jx)->getName() << ":" << P.getParentUnit(ix)->getParent(1)->getGene(jx)->getAllele();
+					if (jx < chromosomeSize-1)
+						cout << ",";
+				}
+				cout << "]" << endl;
+			}
+			
+			cout << endl << endl;
+			*/
+			
+			for (int ix = 0; ix < (populationSize/2); ix++)
+			{
+				cl = P.getParentUnit(ix)->Reproduce(crossoverPoints);
+				O.AddChromosome(cl[0]);
+				O.AddChromosome(cl[1]);
+			}
+			
+			/*
+			for (int ix = 0; ix < populationSize; ix++)
+			{
+		
+				cout << "[";
+				for (int jx = 0; jx < chromosomeSize; jx++)
+				{
+					cout << O.getChromosome(ix)->getGene(jx)->getName() << ":" << O.getChromosome(ix)->getGene(jx)->getAllele();
+					if (jx < chromosomeSize-1)
+						cout << ",";
+				}
+				cout << "] : " << O.getChromosome(ix)->getFitness() << endl;
+			}
+			
+
+			cout << endl << endl;
+			*/
+			
+			for (int ix = 0; ix < populationSize; ix++)
+			{
+				for (int iix = 0; iix < chromosomeSize; iix++)
+				{
+					O.getChromosome(ix)->getGene(iix)->Mutate(mutation,ix+(ix*iix));
+				}
+			}
+			
+			/*
+			
+			for (int ix = 0; ix < populationSize; ix++)
+			{
+		
+				cout << "[";
+				for (int jx = 0; jx < chromosomeSize; jx++)
+				{
+					cout << O.getChromosome(ix)->getGene(jx)->getName() << ":" << O.getChromosome(ix)->getGene(jx)->getAllele();
+					if (jx < chromosomeSize-1)
+						cout << ",";
+				}
+				cout << "] : " << O.getChromosome(ix)->getFitness() << endl;
+			}
+			
+			*/
+			
+
+			
+			P = O;
+			O.clearPopulation();
+			
+			G++;
+			res++;
+		}
+		
+		/*
+		cout << endl; 
+		// View genes
+		for (int ix = 0; ix < populationSize; ix++)
+		{
+		
+			cout << "[";
+			for (int jx = 0; jx < chromosomeSize; jx++)
+			{
+				cout << parents->getChromosome(ix)->getGene(jx)->getName() << ":" << parents->getChromosome(ix)->getGene(jx)->getAllele();
+				if (jx < chromosomeSize-1)
+					cout << ",";
+			}
+			cout << "] : " << parents->getChromosome(ix)->getFitness() << endl;
+		}
+		*/
+		
+	} 
+	catch (string ex) 
+	{
+		cout << ex << endl;
+	}
 	// inputFile.close();
 }

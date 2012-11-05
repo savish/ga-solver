@@ -152,9 +152,14 @@ int Equation::EvaluateRPNExpression(Queue rpnExpression)
 			return localStore.pop().Value();
 		}
 	}
+	catch (string ex)
+	{
+		throw ex;
+	}
 	catch (...)
 	{
-		throw string("Error evaluating expression.");
+		string err = "Error evaluating expression : ";
+		throw string(err.append(localEquation));
 	}
 }
 
@@ -247,8 +252,6 @@ Expression* Equation::ParseEquationToExpression(string toSplit)
 	Expression *parsed = new Expression();
 	Expression toAdd; 
 
-
-
 	string emptyString = "";
 	vector<string> expressionInputs = GAUtility::SplitString(toSplit, " ");
 	vector<string>::iterator s;
@@ -257,7 +260,11 @@ Expression* Equation::ParseEquationToExpression(string toSplit)
 		if (*s != emptyString) 
 		{
 			toAdd = ExpressionFactory::CreateExpression(*s);
-			if (toAdd.Type() == VARIABLE) variableCounter++;
+			if (toAdd.Type() == VARIABLE) 
+			{
+				variableCounter++;
+				variableNames.push_back(toAdd.Name());
+			}
 			parsed->AddChild(toAdd);
 		}
 	}
