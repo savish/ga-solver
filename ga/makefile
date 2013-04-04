@@ -1,6 +1,3 @@
-#Andrea Chalmers 11256339
-#Sonelisiwe Njozela 11272882
-
 FLAGS = -Wall
 TARGET = main
 CHROMOSOME = Chromosome
